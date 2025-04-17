@@ -32,8 +32,16 @@ ax2.set_ylabel("Total Riders")
 ax2.set_title("Total Ridership by Season")
 st.pyplot(fig2)
 
+choices = ["7-Day Average", "14-Day Average", "Total by week"]
+
 st.header("Rolling Average of Riders (7d, 14d, Weekly)")
-option = st.radio(
-  "Select a Rolling Average",
-  ("7-Day Average", "14-Day Average", "Total by week")
-)
+option = st.radio("Select a Rolling Average", choices)
+
+df['7d_avg'] = df['cnt'].rolling(window=7, center=True).mean()
+df['14d_avg'] = df['cnt'].rolling(window=14, center=True).mean()
+
+if option == choices[0]:
+  plt.plot(df['datetime'], df['7d_avg'])
+elif option == choices[1]:
+  plt.plot(df['datetime'], df['7d_avg'])
+  
