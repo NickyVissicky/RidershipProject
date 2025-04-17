@@ -36,3 +36,4 @@ st.header("Rolling Average of Riders (7d, 14d, Weekly)")
 option = st.radio(
   "Select a Rolling Average",
   ("7-Day Average", "14-Day Average", "Total by week")
+)
