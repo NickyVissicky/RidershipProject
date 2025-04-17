@@ -24,8 +24,8 @@ ax.set_title("Total Ridership Over Time")
 
 fig2, ax2 = plt.subplots()
 seasons = ['Winter', 'Spring', 'Summer', 'Fall']
-ax.bar(seasons, df.groupby('season')['cnt'].sum())
-ax.set_xlabel("Season")
-ax.set_ylabel("Total Riders")
-ax.set_title("Total Ridership by Season")
+ax2.bar(seasons, df.groupby('season')['cnt'].sum())
+ax2.set_xlabel("Season")
+ax2.set_ylabel("Total Riders")
+ax2.set_title("Total Ridership by Season")
 st.pyplot(fig2)
