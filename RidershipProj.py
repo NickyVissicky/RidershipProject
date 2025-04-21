@@ -1,47 +1,53 @@
+# Streamlit app
+import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import streamlit as st
+from matplotlib.dates import DateFormatter, MonthLocator
+
+st.title("ICA on 4/17")
 
 df = pd.read_csv('https://raw.githubusercontent.com/iantonios/dsc205/refs/heads/main/bike_sharing.csv')
 
-df['datetime'] = pd.to_datetime(df['dteday'])
+df['dteday'] = pd.to_datetime(df['dteday'])
 
-st.header("Total Ridership Over Time (Count)")
+# 1 -  A line plot of total ridership (column titled cnt) over the course of the entire period.
+figure = plt.figure(figsize=(20,10))
+plt.plot(df['dteday'], df['cnt'])
+plt.xlabel("Date")
+plt.ylabel("Total Riders")
+plt.title("Total Ridership Over Time")
+ax = plt.gca()
+ax.xaxis.set_major_locator(MonthLocator(interval=1))
+ax.xaxis.set_major_formatter(DateFormatter('%m %y'))
+plt.xticks(rotation=45, ha='right')
+st.pyplot(figure)
 
-fig, ax = plt.subplots()
-ax.plot(df['datetime'], df['cnt'])
-ax.set_xlabel("Date")
-ax.set_ylabel("Total Riders")
-ax.set_title("Total Ridership")
-st.pyplot(fig)
-
-fig, ax = plt.subplots()
-ax.plot(df['dteday'], df['cnt'])
-ax.set_xlabel("Date")
-ax.set_ylabel("Total Riders")
-ax.set_title("Total Ridership Over Time")
-
-st.header("Total Ridership by Season")
-
-fig2, ax2 = plt.subplots()
+# 2 - A bar plot that shows total ridership by season (season column: 1 = winter, 2 = spring, etc.)
+figure2 = plt.figure()
 seasons = ['Winter', 'Spring', 'Summer', 'Fall']
-ax2.bar(seasons, df.groupby('season')['cnt'].sum())
-ax2.set_xlabel("Season")
-ax2.set_ylabel("Total Riders")
-ax2.set_title("Total Ridership by Season")
-st.pyplot(fig2)
+plt.bar(seasons, df.groupby('season')['cnt'].sum())
+plt.xlabel("Season")
+plt.ylabel("Total Riders")
+plt.title("Total Ridership by Season")
+st.pyplot(figure2)
 
-choices = ["7-Day Average", "14-Day Average", "Total by week"]
+# 3 - A line plot of total ridership that allows the user to select rolling average.  Using radio buttons, the user may select the following options:
+# "7-day average", "14-day average", "Total"
+figure3 = plt.figure(figsize=(20,20))
 
-st.header("Rolling Average of Riders (7d, 14d, Weekly)")
-option = st.radio("Select a Rolling Average", choices)
+timespan = st.radio("Select a Timespan", ["7-day average", "14-day average", "Week"])
+plt.title("Total Ridership Over the " + timespan)
 
 df['7d_avg'] = df['cnt'].rolling(window=7, center=True).mean()
 df['14d_avg'] = df['cnt'].rolling(window=14, center=True).mean()
 
-if option == choices[0]:
-  plt.plot(df['datetime'], df['7d_avg'])
-elif option == choices[1]:
-  plt.plot(df['datetime'], df['7d_avg'])
-  
+if timespan == '7-day average':
+    plt.plot(df['dteday'], df['7d_avg'], label='7-day average')
+elif timespan == '14-day average':
+    plt.plot(df['dteday'], df['14d_avg'], label='14-day average')
+else:
+    weekly = df.resample('W', on='dteday').sum()
+    plt.plot(weekly.index, weekly['cnt'])
+
+st.pyplot(figure3)
